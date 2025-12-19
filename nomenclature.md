@@ -2,7 +2,7 @@
 
 ## Datasets
 
-To store inside `datsets` directory.
+To store inside `datasets` directory.
 
 ### Historical data
 
