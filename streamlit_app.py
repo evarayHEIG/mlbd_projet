@@ -26,7 +26,7 @@ with st.sidebar:
     
     method = st.selectbox(
         "Select method:",
-        ("pca", "embedding")
+        ("all", "pca", "embedding")
     )
 
     distance_metric = st.selectbox(
@@ -42,19 +42,19 @@ with st.sidebar:
 
     top_n = st.slider(
         "Number of closest cities to display:",
-        min_value=10,
+        min_value=5,
         max_value=100,
-        value=10,
+        value=5,
         step=5
     )
 
     period = st.selectbox(
         "Select period:",
-        ("1970-1979", "2041-2050")
+        ("1940-1970", "2021-2050")
     )
 
     scenario = None
-    if period == "2041-2050":
+    if period == "2021-2050":
         scenario = st.selectbox(
             "Select scenario:",
             ("ssp126", "ssp370", "ssp585")
@@ -75,30 +75,53 @@ def load_distance_matrix(method, distance_metric, period, scenario=None):
         filename = f"{method}_{distance_metric}_{period}.csv"
     
     filepath = os.path.join("distance_matrices", filename)
-    return pd.read_csv(filepath, index_col=0)
+    # La matrice a des colonnes numérotées 1, 2, 3... sans index
+    return pd.read_csv(filepath)
+
+# Load cities from the period datasets to get correct order
+@st.cache_data
+def load_period_cities(period, scenario=None):
+    """Load the cities in the order they appear in the period's climate features file."""
+    if scenario:
+        filename = f"climate_features_{period}_{scenario}.csv"
+    else:
+        filename = f"climate_features_{period}.csv"
+    
+    filepath = os.path.join("datasets", filename)
+    df = pd.read_csv(filepath)
+    return df['city'].values
 
 try:
     distance_matrix = load_distance_matrix(method, distance_metric, period, scenario)
     
-    city_row = cities_df[cities_df['name'] == city]
-    if city_row.empty:
-        st.error(f"City '{city}' not found in database")
+    # Get the city order for the selected period
+    period_cities = load_period_cities(period, scenario)
+    # Cities in columns are always 1994-2024
+    current_cities = load_period_cities('1994-2024', None)
+    
+    # Find city index in the period array
+    try:
+        city_idx_in_period = list(period_cities).index(city)
+    except ValueError:
+        st.error(f"City '{city}' not found in period {period} {scenario if scenario else ''}")
         st.stop()
     
-    city_index = city_row['city_index'].iloc[0]
+    # Get the row for the selected city
+    distances = distance_matrix.iloc[city_idx_in_period]
     
-    if str(city_index) in distance_matrix.columns:
-        distances = distance_matrix[str(city_index)]
-        
-        data = cities_df.copy()
-        data['climate_similarity'] = data['city_index'].map(lambda idx: distances.iloc[idx-1] if idx <= len(distances) else None)
-        data = data.dropna(subset=['climate_similarity'])
-        data = data.sort_values('climate_similarity')
-        data = data.head(top_n)
-        
-    else:
-        st.error(f"City index '{city_index}' not found in distance matrix")
-        st.stop()
+    # Map distances to current cities
+    data = cities_df.copy()
+    
+    # Create a mapping from current_cities to distance values
+    distance_map = {}
+    for idx, city_name in enumerate(current_cities):
+        if idx < len(distances):
+            distance_map[city_name] = distances.iloc[idx]
+    
+    data['climate_similarity'] = data['name'].map(distance_map)
+    data = data.dropna(subset=['climate_similarity'])
+    data = data.sort_values('climate_similarity')
+    data = data.head(top_n)
         
 except FileNotFoundError:
     st.error(f"Distance matrix file not found. Please check the file exists.")
@@ -124,7 +147,7 @@ with col2:
     
     event = st.dataframe(
         display_table,
-        use_container_width=True,
+        width='stretch',
         height=600,
         on_select="rerun",
         selection_mode="single-row"
@@ -140,11 +163,16 @@ with col2:
 with col1:
     st.subheader("Map")
     
+    # Get the coordinates of the filter-selected city
+    filter_city_row = cities_df[cities_df['name'] == city]
+    filter_city_lat = filter_city_row['latitude'].iloc[0] if not filter_city_row.empty else None
+    filter_city_lon = filter_city_row['longitude'].iloc[0] if not filter_city_row.empty else None
+    
     if selected_city_data is not None:
-        # Highlight selected city
+        # Highlight table-selected city
         data_not_selected = data[data['name'] != selected_city_data['name']]
         
-        fig = px.scatter_mapbox(
+        fig = px.scatter_map(
             data_not_selected,
             lat="latitude",
             lon="longitude",
@@ -160,17 +188,18 @@ with col1:
             color_continuous_scale="Greens_r"
         )
         
-        fig.add_scattermapbox(
+        # Add table-selected city marker (filled red)
+        fig.add_scattermap(
             lat=[selected_city_data['latitude']],
             lon=[selected_city_data['longitude']],
             mode='markers',
             marker=dict(size=18, color='red'),
             text=[selected_city_data['name']],
             hovertemplate='<b>%{text}</b><br>SELECTED<extra></extra>',
-            name='Selected'
+            name='Selected from table'
         )
     else:
-        fig = px.scatter_mapbox(
+        fig = px.scatter_map(
             data,
             lat="latitude",
             lon="longitude",
@@ -186,8 +215,24 @@ with col1:
             color_continuous_scale="Greens_r"
         )
     
+    # Add filter-selected city marker (red circle)
+    if filter_city_lat and filter_city_lon:
+        fig.add_scattermap(
+            lat=[filter_city_lat],
+            lon=[filter_city_lon],
+            mode='markers',
+            marker=dict(
+                size=20, 
+                color='red'
+            ),
+            text=[city],
+            hovertemplate='<b>%{text}</b><br>FILTER SELECTED<extra></extra>',
+            name='Filter selected',
+            showlegend=False
+        )
+    
     fig.update_layout(
-        mapbox=dict(
+        map=dict(
             style="carto-darkmatter",
         ),
         height=550,
@@ -203,9 +248,87 @@ with col1:
     
     st.plotly_chart(
         fig,
-        use_container_width=True,
+        width='stretch',
         config={
             "scrollZoom": True,
             "displayModeBar": False
         }
     )
+
+# Distribution of distances section
+st.divider()
+st.subheader("Distance Distribution Analysis")
+
+col_dist1, col_dist2 = st.columns([2, 1])
+
+with col_dist1:
+    # Flatten the distance matrix to get all distances
+    all_distances = distance_matrix.values.flatten()
+    
+    # Create histogram
+    import numpy as np
+    fig_hist = px.histogram(
+        x=all_distances,
+        nbins=50,
+        labels={'x': 'Distance', 'y': 'Frequency'},
+        title=f"Distribution of {distance_metric.capitalize()} Distances"
+    )
+    
+    # Add vertical line for the selected city's distances
+    city_distances = distance_matrix.iloc[city_idx_in_period].values
+    mean_city_distance = np.mean(city_distances)
+    
+    fig_hist.add_vline(
+        x=mean_city_distance,
+        line_dash="dash",
+        line_color="red",
+        annotation_text=f"{city} avg: {mean_city_distance:.2f}",
+        annotation_position="top right"
+    )
+    
+    fig_hist.update_layout(
+        showlegend=False,
+        height=400
+    )
+    
+    st.plotly_chart(fig_hist, width='stretch')
+
+with col_dist2:
+    st.markdown("### Statistics")
+    
+    # Overall statistics
+    st.markdown("**Overall Distribution:**")
+    stats_df = pd.DataFrame({
+        'Metric': ['Min', 'Q1 (25%)', 'Median', 'Q3 (75%)', 'Max', 'Mean', 'Std Dev'],
+        'Value': [
+            f"{np.min(all_distances):.4f}",
+            f"{np.percentile(all_distances, 25):.4f}",
+            f"{np.median(all_distances):.4f}",
+            f"{np.percentile(all_distances, 75):.4f}",
+            f"{np.max(all_distances):.4f}",
+            f"{np.mean(all_distances):.4f}",
+            f"{np.std(all_distances):.4f}"
+        ]
+    })
+    st.dataframe(stats_df, hide_index=True, width='stretch')
+    
+    st.markdown(f"**For {city}:**")
+    city_stats_df = pd.DataFrame({
+        'Metric': ['Min', 'Mean', 'Max'],
+        'Value': [
+            f"{np.min(city_distances):.4f}",
+            f"{np.mean(city_distances):.4f}",
+            f"{np.max(city_distances):.4f}"
+        ]
+    })
+    st.dataframe(city_stats_df, hide_index=True, width='stretch')
+    
+    # Interpretation
+    st.markdown("---")
+    st.markdown("**Interpretation:**")
+    if mean_city_distance < np.percentile(all_distances, 25):
+        st.success("✅ Small distances - High similarity")
+    elif mean_city_distance < np.percentile(all_distances, 75):
+        st.info("📊 Medium distances - Moderate similarity")
+    else:
+        st.warning("⚠️ Large distances - Low similarity")
