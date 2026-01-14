@@ -80,3 +80,16 @@
 #bibliography("biblio.bib", title: "Bibliographie", style: "ieee", full: true)
 
 Pour la correction orthographique : OpenAI, ChatGPT (GPT-5) Model, San Francisco, CA, USA: OpenAI, 2025. [Online]. Available: https://chat.openai.com
+
+#pagebreak()
+
+// Annexes
+#set heading(numbering: none)
+= Annexes
+
+#set heading(numbering: "A.", supplement: [Annexe], outlined: false)
+#counter(heading).update(0)
+
+#include "7_appendix.typ"
+
+#pagebreak()
