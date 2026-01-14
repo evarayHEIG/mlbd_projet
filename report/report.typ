@@ -36,7 +36,7 @@
   
   #text(size: 1.1em)[
     Machine Learning on Big Data\
-    MSE
+    HES-SO MSE
   ]
 
   #v(1.5cm)
