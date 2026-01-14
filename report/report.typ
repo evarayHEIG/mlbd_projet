@@ -55,7 +55,7 @@
 
 #pagebreak()
 
-#set page(margin: 2cm, numbering: "1")
+#set page(margin: 1.75cm, numbering: "1")
 #counter(page).update(1)
 
 #outline()
