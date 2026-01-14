@@ -32,16 +32,20 @@ Pour chaque configuration, nous avons calculé les 5 villes analogues les plus p
 === Période passée (1940-1970)
 
 #figure(
-  table(
-    columns: 4,
-    align: (left, center, center, center),
-    [*Méthode*], [*Distance*], [*Shift moyen (°)*], [*% villes Nord*],
-    [All features], [Euclidienne], [+0.10], [46.2%],
-    [All features], [Mahalanobis], [-0.81], [42.5%],
-    [PCA], [Euclidienne], [+0.28], [48.6%],
-    [PCA], [Mahalanobis], [+0.20], [49.0%],
-    [Embeddings], [Euclidienne], [+0.29], [50.0%],
-    [Embeddings], [Mahalanobis], [+0.34], [50.0%],
+  block(
+    width: 70%,
+    table(
+      columns: 4,
+      align: (left, center, center, center),
+      inset: 5pt,
+      [*Méthode*], [*Distance*], [*Shift moyen (°)*], [*% villes Nord*],
+      [All features], [Euclidienne], [+0.10], [46.2%],
+      [All features], [Mahalanobis], [-0.81], [42.5%],
+      [PCA], [Euclidienne], [+0.28], [48.6%],
+      [PCA], [Mahalanobis], [+0.20], [49.0%],
+      [Embeddings], [Euclidienne], [+0.29], [50.0%],
+      [Embeddings], [Mahalanobis], [+0.34], [50.0%],
+    )
   ),
   caption: [Translation latitudinale moyenne des analogues climatiques pour la période 1940-1970.]
 )
@@ -51,16 +55,20 @@ Pour chaque configuration, nous avons calculé les 5 villes analogues les plus p
 ==== Scénario SSP585
 
 #figure(
-  table(
-    columns: 4,
-    align: (left, center, center, center),
-    [*Méthode*], [*Distance*], [*Shift moyen (°)*], [*% villes Sud*],
-    [All features], [Euclidienne], [-0.90], [58.9%],
-    [All features], [Mahalanobis], [-0.50], [54.5%],
-    [PCA], [Euclidienne], [-1.15], [59.2%],
-    [PCA], [Mahalanobis], [-1.05], [59.2%],
-    [Embeddings], [Euclidienne], [-1.21], [57.5%],
-    [Embeddings], [Mahalanobis], [-1.34], [58.6%],
+  block(
+    width: 70%,
+    table(
+      columns: 4,
+      align: (left, center, center, center),
+      inset: 5pt,
+      [*Méthode*], [*Distance*], [*Shift moyen (°)*], [*% villes Sud*],
+      [All features], [Euclidienne], [-0.90], [58.9%],
+      [All features], [Mahalanobis], [-0.50], [54.5%],
+      [PCA], [Euclidienne], [-1.15], [59.2%],
+      [PCA], [Mahalanobis], [-1.05], [59.2%],
+      [Embeddings], [Euclidienne], [-1.21], [57.5%],
+      [Embeddings], [Mahalanobis], [-1.34], [58.6%],
+    )
   ),
   caption: [Translation latitudinale pour SSP585.]
 )
@@ -70,6 +78,6 @@ Pour chaque configuration, nous avons calculé les 5 villes analogues les plus p
 La @fig:mean_shift présente une vue globale de la translation latitudinale pour toutes les configurations. Le graphique de gauche montre le passé (1940-1970) et celui de droite montre le futur (moyenne des scénarios SSP126, SSP370 et SSP585). Chaque graphique compare les résultats obtenus avec la distance Euclidienne et la distance de Mahalanobis pour les trois méthodes.
 
 #figure(
-  image("/images/mean_shift.png", width: 100%),
+  image("/images/mean_shift.png", width: 90%),
   caption: [Translation latitudinale moyenne par méthode et métrique de distance. Gauche : Période passée (1940-1970). Droite : Période future (2021-2050, moyenne des 3 scénarios SSP).]
 ) <fig:mean_shift>
