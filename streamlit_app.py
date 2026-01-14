@@ -5,7 +5,7 @@ import os
 
 # Streamlit configuration
 st.set_page_config(
-    page_title="Climate Map Europe",
+    page_title="Climate Analogs in Europe",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
