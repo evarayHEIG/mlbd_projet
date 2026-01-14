@@ -5,11 +5,15 @@ import os
 
 # Streamlit configuration
 st.set_page_config(
-    page_title="Climate Map Europe",
-    layout="wide"
+    page_title="Climate Analogs in Europe",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'About': "Climate Analogs in Europe - Explore climate similarities across European cities"
+    }
 )
 
-st.title("Climate Similarity in Europe")
+st.title("Climate Analogs in Europe")
 
 # Load cities data
 @st.cache_data
@@ -91,6 +95,18 @@ def load_period_cities(period, scenario=None):
     df = pd.read_csv(filepath)
     return df['city'].values
 
+# Load climate features data
+@st.cache_data
+def load_climate_features(period, scenario=None):
+    """Load the complete climate features dataset for the given period."""
+    if scenario:
+        filename = f"climate_features_{period}_{scenario}.csv"
+    else:
+        filename = f"climate_features_{period}.csv"
+    
+    filepath = os.path.join("datasets", filename)
+    return pd.read_csv(filepath)
+
 try:
     distance_matrix = load_distance_matrix(method, distance_metric, period, scenario)
     
@@ -98,6 +114,9 @@ try:
     period_cities = load_period_cities(period, scenario)
     # Cities in columns are always 1994-2024
     current_cities = load_period_cities('1994-2024', None)
+    
+    # Load climate features for the selected period
+    climate_features = load_climate_features(period, scenario)
     
     # Find city index in the period array
     try:
@@ -233,7 +252,7 @@ with col1:
     
     fig.update_layout(
         map=dict(
-            style="carto-darkmatter",
+            style="carto-voyager",
         ),
         height=550,
         margin=dict(l=0, r=0, t=40, b=0),
@@ -254,6 +273,83 @@ with col1:
             "displayModeBar": False
         }
     )
+
+
+# Hot Days Information Section
+st.divider()
+st.subheader("Hot Days Analysis")
+
+col_hot1, col_hot2 = st.columns(2)
+
+# Get hot days data for the selected city
+city_climate_data = climate_features[climate_features['city'] == city]
+
+if not city_climate_data.empty:
+    hot_days = city_climate_data['hot_days'].iloc[0]
+    hot_days_consec = city_climate_data['hot_days_consec'].iloc[0]
+    
+    with col_hot1:
+        st.metric(
+            label="🌡️ Hot days per year (>30°C)",
+            value=f"{hot_days:.1f} days",
+            help="Average number of days per year where temperature exceeds 30°C"
+        )
+    
+    with col_hot2:
+        st.metric(
+            label="🔥 Max consecutive hot days",
+            value=f"{hot_days_consec:.1f} days",
+            help="Maximum number of consecutive days exceeding 30°C"
+        )
+else:
+    st.warning(f"Hot days data not available for {city}")
+
+# Temperature by Season Section
+st.divider()
+st.subheader("Temperature by Season")
+
+if not city_climate_data.empty:
+    # Extract temperature data for each season
+    seasons = ['winter', 'spring', 'summer', 'autumn']
+    season_names = {
+        'winter': '❄️ Winter',
+        'spring': '🌸 Spring', 
+        'summer': '☀️ Summer',
+        'autumn': '🍂 Autumn'
+    }
+    
+    # Create 4 columns for seasons
+    season_cols = st.columns(4)
+    
+    for idx, season in enumerate(seasons):
+        with season_cols[idx]:
+            st.markdown(f"### {season_names[season]}")
+            
+            # Get temperature values (converting from Kelvin to Celsius)
+            t2m_avg = city_climate_data[f't2m_{season}'].iloc[0] - 273.15
+            t2m_max = city_climate_data[f'max_t2m_{season}'].iloc[0] - 273.15
+            t2m_min = city_climate_data[f'min_t2m_{season}'].iloc[0] - 273.15
+            
+            # Display metrics
+            st.metric(
+                label="Average temperature",
+                value=f"{t2m_avg:.1f}°C",
+                help="Mean temperature for the season averaged over the time period"
+            )
+            st.metric(
+                label="Maximum",
+                value=f"{t2m_max:.1f}°C",
+                delta=None,
+                help="Average of daily maximum temperatures for the season, then averaged over the time period"
+            )
+            st.metric(
+                label="Minimum",
+                value=f"{t2m_min:.1f}°C",
+                delta=None,
+                help="Average of daily minimum temperatures for the season, then averaged over the time period"
+            )
+else:
+    st.warning(f"Temperature data not available for {city}")
 
 # Distribution of distances section
 st.divider()
@@ -311,24 +407,3 @@ with col_dist2:
         ]
     })
     st.dataframe(stats_df, hide_index=True, width='stretch')
-    
-    st.markdown(f"**For {city}:**")
-    city_stats_df = pd.DataFrame({
-        'Metric': ['Min', 'Mean', 'Max'],
-        'Value': [
-            f"{np.min(city_distances):.4f}",
-            f"{np.mean(city_distances):.4f}",
-            f"{np.max(city_distances):.4f}"
-        ]
-    })
-    st.dataframe(city_stats_df, hide_index=True, width='stretch')
-    
-    # Interpretation
-    st.markdown("---")
-    st.markdown("**Interpretation:**")
-    if mean_city_distance < np.percentile(all_distances, 25):
-        st.success("✅ Small distances - High similarity")
-    elif mean_city_distance < np.percentile(all_distances, 75):
-        st.info("📊 Medium distances - Moderate similarity")
-    else:
-        st.warning("⚠️ Large distances - Low similarity")
