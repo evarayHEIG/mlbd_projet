@@ -41,18 +41,21 @@
 
   #v(1.5cm)
   
-  #text(size: 1.1em)[Eva Ray, Massimo Stefani, Abdellah Jahjah Areddam]
+  #text(size: 1.1em)[Eva Ray, Massimo Stefani, Abdellah Jahjah]
   
   #text(size: 1em, lang: "fr")[
     #datetime.today().display("[day padding:none] Janvier [year]")
   ]
+
+  #v(1cm)
+  #text(size: 1.1em)[Site de Provence, Lausanne]
 
   
 ]
 
 #pagebreak()
 
-#set page(header: "MLBD", margin: 2cm, numbering: "1")
+#set page(margin: 2cm, numbering: "1")
 #counter(page).update(1)
 
 #outline()
@@ -75,3 +78,5 @@
 #show "Available": "Lien"
 #show link: l => underline(l)
 #bibliography("biblio.bib", title: "Bibliographie", style: "ieee", full: true)
+
+Pour la correction orthographique : OpenAI, ChatGPT (GPT-5) Model, San Francisco, CA, USA: OpenAI, 2025. [Online]. Available: https://chat.openai.com
