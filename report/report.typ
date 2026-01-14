@@ -24,11 +24,11 @@
   #v(8cm)
   
   #text(size: 2.5em, weight: "bold")[
-    Climate Analogs in Europe
+    Analogues climatiques en Europe
   ]
   
   #text(size: 1.3em)[
-    What city's climate is is now the climate in my city?
+    Quelle ville vit aujourd'hui le climat passé ou futur de votre ville ?
   ]
   
   
