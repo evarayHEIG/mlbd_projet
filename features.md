@@ -11,21 +11,6 @@
 
 - near-surface air temperature (tas) in K
 - near-surface wind speed in m/s
-- Precipitation (km/m²/s) : The sum of liquid and frozen water, comprising rain and snow, that falls to the Earth's surface. It is the sum of large-scale precipitation and convective precipitation. This parameter does not include fog, dew or the precipitation that evaporates in the atmosphere before it lands at the surface of the Earth. This variable represents amount of water per unit area and time.
-- snowfall flux (km/m²/s) : Mass of water in the form of snow precipitating per unit area.
+- Precipitation (km/m²/s)
+- Snowfall flux (km/m²/s)
 
-Monthly mean of daily accumulated precipitation mm : Monthly mean of daily accumulated precipitation of liquid water equivalent from all phases
-Monthly mean of daily accumulated snowfall precipitation mm: Monthly mean of daily accumulated liquid water equivalent thickness snowfall
-Monthly mean of daily maximum temperature °C: Monthly mean of daily maximum near-surface (2 meters) air temperature
-Monthly mean of daily mean temperature °C: Monthly mean of daily mean near-surface (2 meters) air temperature
-Monthly mean of daily mean wind speed m s-1: Monthly mean of daily mean near-surface (10 meters) wind speed
-Monthly mean of daily minimum temperature °C:Monthly mean of daily minimum near-surface (2 meters) air temperature
-
--https://data.isimip.org/search/tree/ISIMIP3b/InputData/climate/atmosphere/ipsl-cm6a-lr/ssp585/prsn/tree/ISIMIP3b/InputData/climate/atmosphere/ipsl-cm6a-lr/ssp585/pr/tree/ISIMIP3b/InputData/climate/atmosphere/ipsl-cm6a-lr/ssp585/sfcwind/tree/ISIMIP3b/InputData/climate/atmosphere/ipsl-cm6a-lr/ssp585/tasmax/tree/ISIMIP3b/InputData/climate/atmosphere/ipsl-cm6a-lr/ssp585/tasmin/tree/ISIMIP3b/InputData/climate/atmosphere/ipsl-cm6a-lr/ssp585/tas/
--https://cds.climate.copernicus.eu/datasets/projections-climate-atlas?tab=overview
--https://cds.climate.copernicus.eu/datasets/multi-origin-c3s-atlas?tab=overview
--isimip3b: https://www.isimip.org/documents/413/ISIMIP3b_bias_adjustment_fact_sheet_Gnsz7CO.pdf?
-
-
-https://simplemaps.com/data/world-cities
-https://github.com/Rct567/Cities-of-the-world/tree/master

@@ -30,7 +30,7 @@ To store inside `distance_matrices` directory.
 ex: pca_euclidean_1970-1979
 ```
 
-- method: pca or embedding
+- method: pca, embedding or all (all features without dimensionality reduction)
 - distance_metric: euclidean, mahalanobis
 
 ### Predicted future distance matrices
