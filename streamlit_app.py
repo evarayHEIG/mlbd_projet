@@ -5,7 +5,6 @@ import pandas as pd
 import plotly.express as px
 import os
 
-# Streamlit configuration
 st.set_page_config(
     page_title="Climate Analogs in Europe",
     layout="wide",
@@ -17,7 +16,6 @@ st.set_page_config(
 
 st.title("Climate Analogs in Europe")
 
-# Load cities data
 @st.cache_data
 def load_cities():
     df = pd.read_csv("datasets/european_cities.csv")
@@ -81,7 +79,6 @@ def load_distance_matrix(method, distance_metric, period, scenario=None):
         filename = f"{method}_{distance_metric}_{period}.csv"
     
     filepath = os.path.join("distance_matrices", filename)
-    # La matrice a des colonnes numérotées 1, 2, 3... sans index
     return pd.read_csv(filepath)
 
 # Load cities from the period datasets to get correct order

@@ -1,8 +1,30 @@
-# MLBD Project - Climate Analogs
+# MLBD Project - Climate Analogs for European Cities
 
-#### Authors: Eva Ray, Massimo Stefani, Abdellah Jahjah
+## Installation
 
-This project identifies climate analogues for European cities in 1970 (backward) and 2050 (forward). Each city is represented by a multidimensional climate vector built from seasonal averages of temperature, precipitation, and wind speed. Similarity between cities is computed using metrics such as Mahalanobis and Euclidean distances. The results are displayed on an interactive map that lets users explore which cities share comparable past or future climates.
+### Prerequisites
+
+- Python 3.13+
+- pip
+
+### Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Streamlit Application
+
+An interactive Streamlit application to explore climate analogs for European cities.
+
+### Running the application
+
+```bash
+streamlit run streamlit_app.py
+```
+
+The application will be available at: `http://localhost:8501`
+
 
 ## Notebooks
 
