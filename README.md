@@ -1,4 +1,30 @@
-# mlbd_projet
+# MLBD Project - Climate Analogs for European Cities
+
+## Installation
+
+### Prerequisites
+
+- Python 3.13+
+- pip
+
+### Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Streamlit Application
+
+An interactive Streamlit application to explore climate analogs for European cities.
+
+### Running the application
+
+```bash
+streamlit run streamlit_app.py
+```
+
+The application will be available at: `http://localhost:8501`
+
 
 ## Notebooks
 
